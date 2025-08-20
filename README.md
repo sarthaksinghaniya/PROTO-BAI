@@ -1,7 +1,6 @@
 # 🚀 PROTO-BAI (Dev Mode)
 
 > **A modular, voice-enabled AI assistant prototype for developers and innovators.**
-
 ---
 
 ## 📌 Overview
