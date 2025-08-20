@@ -26,23 +26,58 @@
       }
 
       .sidebar {
-        overflow: scroll;
+        overflow: hidden; /* clip to rounded corners */
         scrollbar-width: none;
         width: 280px;
-        background: rgba(255, 255, 255, 0.95);
+        background: #ffffff; /* fully opaque to avoid bleed-through */
         border-radius: 20px;
         padding: 20px;
         backdrop-filter: blur(10px);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Inner scroll container to preserve scrolling while clipping corners */
+      .sidebar-inner {
+        flex: 1;
+        min-height: 0; /* allow child to shrink properly within flex container */
+        overflow: auto;
+        padding-right: 6px; /* space for scrollbar */
+      }
+
+      /* Removed masking overlay on sidebar; structure now prevents peeking */
+
+      .modules-section {
+        position: relative;
+      }
+
+      /* No extra margin needed; profile is outside the scroll container */
+      .modules-section .module-btn:first-of-type {
+        margin-top: 0;
+      }
+
+      .module-btn {
+        position: relative;
       }
 
       .profile-section {
-        background: rgba(139, 95, 191, 0.1);
+        background: #ffffff; /* solid background to avoid showing menu behind */
         border-radius: 15px;
         padding: 15px;
         text-align: center;
         margin-bottom: 20px;
+        /* profile stays fixed above the scroll container; sticky optional */
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(6px);
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+        /* no extra white mask edge needed */
       }
+
+      /* Removed profile masks; not needed with structured layout */
 
       .profile-pic {
         font-size: 40px;
@@ -315,7 +350,7 @@
       }
 
       .typing-indicator {
-        display: none;
+        display: inline-block;
         color: #8b5fbf;
         font-style: italic;
         animation: blink 1.5s infinite;
@@ -348,50 +383,55 @@
           </div>
         </div>
 
-        <!-- Modules Section -->
-        <div class="modules-section">
-          <h4>Modules</h4>
-          <button class="module-btn" onclick="activateModule('file-explorer')">
-            <span style="font-size: 18px">📁</span> File Explorer
-          </button>
-          <button class="module-btn" onclick="activateModule('web-crawler')">
-            <span style="font-size: 18px">🌐</span> Web Crawler
-          </button>
-          <button class="module-btn" onclick="activateModule('github-search')">
-            <span style="font-size: 18px">🐙</span> GitHub Search
-          </button>
-          <button class="module-btn" onclick="activateModule('ticket-booking')">
-            <span style="font-size: 18px">🎫</span> Ticket Booking
-          </button>
-          <button class="module-btn" onclick="activateModule('ai-sync')">
-            <span style="font-size: 18px">🤖</span> AI Sync
-          </button>
-          <button class="module-btn" onclick="activateModule('error-solver')">
-            <span style="font-size: 18px">🔧</span> Error Solver
-          </button>
-          <button class="module-btn" onclick="activateModule('python-docs')">
-            <span style="font-size: 18px">🐍</span> Python Documentation
-          </button>
-        </div>
-
-        <!-- Settings Section -->
-        <div class="settings-section">
-          <h4>Settings</h4>
-          <div class="setting-row">
-            <label>Theme:</label>
-            <select onchange="changeTheme(this.value)">
-              <option value="fairy-tail">Fairy Tail</option>
-              <option value="ocean-breeze">Ocean Breeze</option>
-              <option value="sunset-glow">Sunset Glow</option>
-            </select>
+        <div class="sidebar-inner">
+          <!-- Modules Section -->
+          <div class="modules-section">
+            <h4>Modules</h4>
+            <button class="module-btn" onclick="backToNormal()">
+              <span style="font-size: 18px">⬅</span> Back to Normal
+            </button>
+            <button class="module-btn" onclick="activateModule('file-explorer')">
+              <span style="font-size: 18px">📁</span> File Explorer
+            </button>
+            <button class="module-btn" onclick="activateModule('web-crawler')">
+              <span style="font-size: 18px">🌐</span> Web Crawler
+            </button>
+            <button class="module-btn" onclick="activateModule('github-search')">
+              <span style="font-size: 18px">🐙</span> GitHub Search
+            </button>
+            <button class="module-btn" onclick="activateModule('ticket-booking')">
+              <span style="font-size: 18px">🎫</span> Ticket Booking
+            </button>
+            <button class="module-btn" onclick="activateModule('ai-sync')">
+              <span style="font-size: 18px">🤖</span> AI Sync
+            </button>
+            <button class="module-btn" onclick="activateModule('error-solver')">
+              <span style="font-size: 18px">🔧</span> Error Solver
+            </button>
+            <button class="module-btn" onclick="activateModule('python-docs')">
+              <span style="font-size: 18px">🐍</span> Python Documentation
+            </button>
           </div>
-          <div class="setting-row">
-            <label>Voice:</label>
-            <select onchange="changeVoice(this.value)">
-              <option value="girl-soft">Girl Soft</option>
-              <option value="male-professional">Male Professional</option>
-              <option value="neutral-calm">Neutral Calm</option>
-            </select>
+
+          <!-- Settings Section -->
+          <div class="settings-section">
+            <h4>Settings</h4>
+            <div class="setting-row">
+              <label>Theme:</label>
+              <select onchange="changeTheme(this.value)">
+                <option value="fairy-tail">Fairy Tail</option>
+                <option value="ocean-breeze">Ocean Breeze</option>
+                <option value="sunset-glow">Sunset Glow</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label>Voice:</label>
+              <select onchange="changeVoice(this.value)">
+                <option value="girl-soft">Girl Soft</option>
+                <option value="male-professional">Male Professional</option>
+                <option value="neutral-calm">Neutral Calm</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -431,6 +471,8 @@
     <script>
       let isListening = false;
       let messageCount = 0;
+      let errorSolverActive = false; // Error Solver mode flag
+      let activeModule = null; // Track which module is active
 
       function getCurrentTime() {
         return new Date().toLocaleTimeString([], {
@@ -444,21 +486,32 @@
         const messageDiv = document.createElement("div");
         messageDiv.className = `message ${type}-message`;
 
+        // Coerce message to string safely
+        const safeMsg =
+          typeof message === "string"
+            ? message
+            : message == null
+            ? ""
+            : (() => {
+                try {
+                  return JSON.stringify(message);
+                } catch (_) {
+                  return String(message);
+                }
+              })();
+
         messageDiv.innerHTML = `
-
-
-
     <div class="message-header">
         ${sender} <span class="timestamp">(${getCurrentTime()})</span>
     </div>
-    <div>${message.replace(/\n/g, "<br>")}</div>
+    <div>${safeMsg.replace(/\n/g, "<br>")}</div>
 `;
 
         chatArea.appendChild(messageDiv);
         chatArea.scrollTop = chatArea.scrollHeight;
       }
 
-      async function sendMessage() {
+      async function sendMessageLegacyUnused() {
         const input = document.getElementById("textInput");
         const message = input.value.trim();
 
@@ -495,7 +548,7 @@
               const randomResponse =
                 responses[Math.floor(Math.random() * responses.length)];
               addMessage("PROTO-BAI", randomResponse, "ai");
-            }, 1500);
+            }, 200);
           }
         } catch (error) {
           console.error("Error processing message:", error);
@@ -508,21 +561,9 @@
         }
       }
 
-      
-
       function showTypingIndicator() {
-        const chatArea = document.getElementById("chatArea");
-        const typingDiv = document.createElement("div");
-        typingDiv.className = "message ai-message typing-indicator";
-        typingDiv.id = "typingIndicator";
-        typingDiv.innerHTML = `
-                <div class="message-header">
-                    PROTO-BAI <span class="timestamp">(${getCurrentTime()})</span>
-                </div>
-                <div>🤔 Thinking...</div>
-            `;
-        chatArea.appendChild(typingDiv);
-        chatArea.scrollTop = chatArea.scrollHeight;
+        // Disabled: no thinking indicator
+        return;
       }
 
       function hideTypingIndicator() {
@@ -530,6 +571,41 @@
         if (typingIndicator) {
           typingIndicator.remove();
         }
+      }
+
+      // Create or update a chat message by a specific id (used for streaming)
+      function addMessageWithId(sender, message, type = "ai", id) {
+        const chatArea = document.getElementById("chatArea");
+        let messageDiv = id ? document.getElementById(id) : null;
+        if (!messageDiv) {
+          messageDiv = document.createElement("div");
+          messageDiv.className = `message ${type}-message`;
+          if (id) messageDiv.id = id;
+          chatArea.appendChild(messageDiv);
+        }
+
+        // Coerce message to string safely
+        const safeMsg =
+          typeof message === "string"
+            ? message
+            : message == null
+            ? ""
+            : (() => {
+                try {
+                  return JSON.stringify(message);
+                } catch (_) {
+                  return String(message);
+                }
+              })();
+
+        messageDiv.innerHTML = `
+    <div class="message-header">
+        ${sender} <span class="timestamp">(${getCurrentTime()})</span>
+    </div>
+    <div>${safeMsg.replace(/\n/g, "<br>")}</div>
+`;
+        chatArea.scrollTop = chatArea.scrollHeight;
+        return messageDiv.id || id;
       }
 
       function toggleVoice() {
@@ -541,7 +617,7 @@
           voiceBtn.style.background = "#EF4444";
           addMessage("System", "🎤 Listening... Speak now!", "system");
 
-          // Simulate voice recognition
+          // Simulate voice recognition (faster)
           setTimeout(() => {
             isListening = false;
             voiceBtn.textContent = "🎤";
@@ -558,7 +634,7 @@
               voiceInputs[Math.floor(Math.random() * voiceInputs.length)];
             addMessage("You (Voice)", randomInput, "user");
 
-            // Trigger AI response
+            // Trigger AI response (faster, no typing indicator)
             showTypingIndicator();
             setTimeout(() => {
               hideTypingIndicator();
@@ -567,8 +643,8 @@
                 "🎤 (Mock Voice) I heard you clearly! In production mode, I would provide full voice interaction.",
                 "ai"
               );
-            }, 1500);
-          }, 3000);
+            }, 200);
+          }, 800);
         }
       }
 
@@ -676,7 +752,40 @@
         addMessage("PROTO-BAI", response, "ai");
       }
 
+      // Error Solver: analyze error logs/messages and propose fixes
+      async function processErrorSolver(inputText) {
+        // Quick exit command
+        const lower = inputText.trim().toLowerCase();
+        if (lower === "exit error solver" || lower === "exit" || lower === "quit") {
+          errorSolverActive = false;
+          addMessage("System", "🚪 Exited Error Solver mode.", "system");
+          return;
+        }
+
+        const prompt = `You are a senior debugging assistant. Given an error/stack trace or failure description, do the following:
+
+Detect and state the most likely language/framework/tooling (e.g., React, Next.js, Node, Python, Django, Flask, Java, Spring, Git/GitHub Actions).
+
+Output using these sections (short and actionable):
+1) Root cause: one or two lines.
+2) How to fix: concrete numbered steps.
+3) Patch (unified diff or minimal code/config block). Keep it minimal and valid.
+4) Commands: list exact shell commands needed (install/build/test). One command per line.
+5) Verification: how to confirm the fix (tests, commands, expected logs).
+
+If the input is ambiguous, ask at most 2 targeted questions at the end under "Questions".
+
+Error input:\n\n${inputText}`;
+
+        const placeholderId = `err-${Date.now()}`;
+        addMessageWithId("PROTO-BAI", "🛠️ Analyzing error…", "ai", placeholderId);
+        const text = await callGeminiAPIStream(prompt, placeholderId);
+        // Attach action bar with copy helpers
+        addActionBarBelow(placeholderId, text || "");
+      }
+
       function activateModule(moduleName) {
+        activeModule = moduleName;
         if (moduleName === "python-docs") {
           // Show Python documentation interface
           const message =
@@ -703,10 +812,117 @@
           demoHtml += `</div>`;
 
           addMessage("System", demoHtml, "system");
+        } else if (moduleName === "error-solver") {
+          errorSolverActive = true;
+          let msg = `🧰 <strong>Error Solver</strong> activated.<br><br>`;
+          msg += `Paste your error log, stack trace, or describe the failure. I will analyze and propose a fix.<br><br>`;
+          msg += `<strong>Tips:</strong><br>`;
+          msg += `• Include the exact error message and relevant code/config snippets.<br>`;
+          msg += `• To exit, type <code>exit error solver</code>.<br>`;
+          msg += `• You can also prefix with <code>fix:</code> or <code>error:</code> (works without activating the module).<br>`;
+          msg += `<br><strong>Quick examples:</strong><br>`;
+          msg += `• <span class="command" onclick="prefillError('TypeError: Cannot read properties of undefined (reading \"map\") at App.js:42')">React: Cannot read properties of undefined</span><br>`;
+          msg += `• <span class="command" onclick="prefillError('ModuleNotFoundError: No module named \"requests\"')">Python: No module named requests</span><br>`;
+          msg += `• <span class="command" onclick="prefillError('ReferenceError: fetch is not defined in Node.js environment')">Node: fetch is not defined</span><br>`;
+          msg += `<button class="back-to-normal" onclick="backToNormal()">Back to Normal</button>`;
+          addMessage("System", msg, "system");
         } else {
           // Default module activation
           addMessage("System", `Activated module: ${moduleName}`, "system");
         }
+      }
+
+      function backToNormal() {
+        // Reset all module-specific flags
+        if (errorSolverActive) {
+          errorSolverActive = false;
+        }
+        const prev = activeModule;
+        activeModule = null;
+        hideTypingIndicator();
+        addMessage(
+          "System",
+          `⬅ Returned to <strong>Normal Mode</strong>${prev ? ` (exited <code>${prev}</code>)` : ""}.`,
+          "system"
+        );
+      }
+
+      // Clipboard utility and action bar for answers
+      async function copyToClipboard(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          addMessage("System", "✅ Copied to clipboard", "system");
+        } catch (e) {
+          console.warn("Clipboard failed:", e);
+          addMessage("System", "❌ Copy failed. Select and copy manually.", "system");
+        }
+      }
+
+      function extractCommandsFromText(text) {
+        const lines = (text || "").split(/\r?\n/);
+        const cmdPatterns = [
+          /^(npm|pnpm|yarn)\s+(install|add|i)\b.*/i,
+          /^(npm|pnpm|yarn)\s+run\s+\w+.*/i,
+          /^(npx)\s+.+/i,
+          /^(pip3?|python\s+-m\s+pip)\s+install\b.+/i,
+          /^pytest(\s+.+)?$/i,
+          /^(python|node)\s+\S+.*/i,
+          /^git\s+(clone|pull|fetch|submodule\s+update|checkout|apply)\b.+/i,
+          /^(docker|docker-compose)\s+.+/i,
+        ];
+        const cmds = new Set();
+        for (const l of lines) {
+          const s = l.trim();
+          if (!s) continue;
+          if (cmdPatterns.some((re) => re.test(s))) cmds.add(s);
+          // Also capture lines starting with '$ '
+          if (s.startsWith("$ ")) cmds.add(s.slice(2));
+        }
+        return Array.from(cmds).slice(0, 6); // limit to 6 buttons
+      }
+
+      function addActionBarBelow(messageId, text) {
+        const msgEl = document.getElementById(messageId);
+        if (!msgEl) return;
+        const bar = document.createElement("div");
+        bar.style.marginTop = "8px";
+        bar.style.display = "flex";
+        bar.style.flexWrap = "wrap";
+        bar.style.gap = "6px";
+
+        const copyAll = document.createElement("button");
+        copyAll.textContent = "📋 Copy Answer";
+        copyAll.style.padding = "4px 8px";
+        copyAll.style.border = "1px solid rgba(0,0,0,0.1)";
+        copyAll.style.borderRadius = "8px";
+        copyAll.style.background = "#f3f4f6";
+        copyAll.style.cursor = "pointer";
+        copyAll.onclick = () => copyToClipboard(text);
+        bar.appendChild(copyAll);
+
+        const cmds = extractCommandsFromText(text);
+        cmds.forEach((c) => {
+          const btn = document.createElement("button");
+          btn.textContent = `▶ ${c}`;
+          btn.title = "Copy command";
+          btn.style.padding = "4px 8px";
+          btn.style.border = "1px solid rgba(0,0,0,0.1)";
+          btn.style.borderRadius = "8px";
+          btn.style.background = "#eef2ff";
+          btn.style.color = "#3730a3";
+          btn.style.cursor = "pointer";
+          btn.onclick = () => copyToClipboard(c);
+          bar.appendChild(btn);
+        });
+
+        msgEl.appendChild(bar);
+      }
+
+      // Helper to prefill an error sample and send
+      function prefillError(text) {
+        const input = document.getElementById("textInput");
+        input.value = text;
+        sendMessage();
       }
 
       // Handle Python documentation commands from buttons
@@ -769,18 +985,51 @@
 
           // Disable input while processing
           input.disabled = true;
-          input.placeholder = "PROTO-BAI is thinking...";
+          // Do not change placeholder to avoid showing "thinking" state
 
           try {
             // Add user message to chat
             addMessage("You", message, "user");
             input.value = "";
 
-            // Call Gemini API
-            const response = await callGeminiAPI(message);
+            const lower = message.toLowerCase();
+            const identityPhrases = new Set([
+              "who are you",
+              "who are you?",
+              "who created you",
+              "tell me about yourself",
+              "tell me about yourself?",
+              "tell us about yourself",
+              "tell us about yourself?",
+              "tell me about you",
+              "tell me about you?",
+              "what is your aim",
+              "what is your aim?",
+              "what can you do",
+              "what can you do?",
+            ]);
 
-            // Add AI response to chat
-            addMessage("PROTO-BAI", response, "ai");
+            // Fast path: identity answer without API
+            if (identityPhrases.has(lower)) {
+              addMessage("PROTO-BAI", "I am PROTO-AI trained by Sarthak & Dev");
+            } else if (
+              lower.startsWith("python ") ||
+              lower.startsWith("help ") ||
+              lower.startsWith("python_help ")
+            ) {
+              // Handle Python documentation commands
+              await processPythonCommand(message);
+            } else if (errorSolverActive || message.toLowerCase().startsWith("fix:") || message.toLowerCase().startsWith("error:")) {
+              // Error Solver routing
+              const clean = message.replace(/^\s*(fix:|error:)\s*/i, "");
+              await processErrorSolver(clean || message);
+            } else {
+              // Stream Gemini API for general queries
+              const placeholderId = `msg-${Date.now()}`;
+              // single thinking placeholder; streaming will update this same message
+              addMessageWithId("PROTO-BAI", "", "ai", placeholderId);
+              await callGeminiAPIStream(message, placeholderId);
+            }
           } catch (error) {
             console.error("Error:", error);
             addMessage(
@@ -809,6 +1058,10 @@
       const GEMINI_API_URL =
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
+      // Streaming endpoint
+      const GEMINI_STREAM_URL =
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent";
+
       // Function to call Gemini API
       async function callGeminiAPI(prompt) {
         showTypingIndicator();
@@ -831,6 +1084,10 @@
                     ],
                   },
                 ],
+                generationConfig: {
+                  maxOutputTokens: 256,
+                  temperature: 0.8,
+                },
               }),
             }
           );
@@ -860,6 +1117,107 @@
         }
       }
 
+      // Stream Gemini API and update a message in-place
+      async function callGeminiAPIStream(prompt, messageId) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000); // 15s safety timeout
+        let accumulated = "";
+        try {
+          const response = await fetch(`${GEMINI_STREAM_URL}?key=${GEMINI_API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: prompt,
+                    },
+                  ],
+                },
+              ],
+              generationConfig: {
+                maxOutputTokens: 256,
+                temperature: 0.8,
+              },
+            }),
+          });
+
+          if (!response.ok || !response.body) {
+            throw new Error(`Streaming failed with status ${response.status}`);
+          }
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder("utf-8");
+          let buffer = "";
+
+          // Initialize placeholder
+          addMessageWithId("PROTO-BAI", "", "ai", messageId);
+
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const parts = buffer.split("\n\n");
+            buffer = parts.pop();
+            for (const chunk of parts) {
+              const line = chunk.trim();
+              if (!line.startsWith("data:")) continue;
+              const jsonStr = line.replace(/^data:\s*/, "");
+              if (jsonStr === "[DONE]") continue;
+              try {
+                const json = JSON.parse(line.replace(/^data: /, ""));
+                // Extract delta text based on Gemini stream format
+                const parts =
+                  json &&
+                  json.candidates &&
+                  json.candidates[0] &&
+                  json.candidates[0].content &&
+                  json.candidates[0].content.parts;
+                if (Array.isArray(parts)) {
+                  const delta = parts
+                    .map((p) => (typeof p.text === "string" ? p.text : ""))
+                    .join("");
+                  accumulated += delta;
+                  addMessageWithId("PROTO-BAI", accumulated, "ai", messageId);
+                }
+              } catch (e) {
+                // ignore parse errors for non-JSON control chunks
+              }
+            }
+          }
+
+          // If stream completed but nothing was received, fallback to non-stream call
+          if (!accumulated || accumulated.trim() === "") {
+            try {
+              const fallbackText = await callGeminiAPI(prompt);
+              addMessageWithId("PROTO-BAI", fallbackText, "ai", messageId);
+              accumulated = fallbackText || "";
+            } catch (e) {
+              addMessageWithId(
+                "System",
+                "No response received from streaming API and fallback failed.",
+                "system",
+                messageId
+              );
+            }
+          }
+
+          hideTypingIndicator();
+          clearTimeout(timeout);
+          return accumulated || "";
+        } catch (err) {
+          console.warn("Streaming failed, falling back:", err);
+          hideTypingIndicator();
+          clearTimeout(timeout);
+          // Fallback to non-stream call
+          const text = await callGeminiAPI(prompt);
+          addMessageWithId("PROTO-BAI", text, "ai", messageId);
+          return text;
+        }
+      }
+
       // Function to handle sending messages
       async function sendMessage() {
         const input = document.getElementById("textInput");
@@ -873,18 +1231,49 @@
 
         // Disable input while processing
         input.disabled = true;
-        input.placeholder = "PROTO-BAI is thinking...";
+        // Do not change placeholder to avoid showing "thinking" state
 
         try {
           // Add user message to chat
           addMessage("You", message, "user");
           input.value = "";
 
-          // Call Gemini API
-          const response = await callGeminiAPI(message);
+          // Error Solver routing takes precedence
+          if (errorSolverActive || message.toLowerCase().startsWith("fix:") || message.toLowerCase().startsWith("error:")) {
+            const clean = message.replace(/^\s*(fix:|error:)\s*/i, "");
+            await processErrorSolver(clean || message);
+            return;
+          }
 
-          // Add AI response to chat
-          addMessage("PROTO-BAI", response, "ai");
+          const lower = message.toLowerCase();
+          const identityPhrases = new Set([
+            "who are you",
+            "who are you?",
+            "tell me about yourself",
+            "tell me about yourself?",
+            "tell us about yourself",
+            "tell us about yourself?",
+            "tell me about you",
+            "tell me about you?",
+            "what is your aim",
+            "what is your aim?",
+            "what can you do",
+            "what can you do?",
+          ]);
+
+          if (identityPhrases.has(lower)) {
+            addMessage("PROTO-BAI", "i am proto bai trained by sarthak", "ai");
+          } else if (
+            lower.startsWith("python ") ||
+            lower.startsWith("help ") ||
+            lower.startsWith("python_help ")
+          ) {
+            await processPythonCommand(message);
+          } else {
+            // Stream Gemini API
+            const placeholderId = `msg-${Date.now()}`;
+            await callGeminiAPIStream(message, placeholderId);
+          }
         } catch (error) {
           console.error("Error in sendMessage:", error);
           addMessage(
@@ -904,14 +1293,43 @@
         }
       }
 
-      // Initialize with a demo message
+      // Initialize with a demo message (immediate)
       setTimeout(() => {
         addMessage(
           "System",
-          "Welcome to PROTO-BAI DEV mode! Try typing a message or clicking the voice button.",
+          "Welcome to PROTO-BAI ! Learn new things 😎 ",
           "system"
         );
-      }, 1000);
+      }, 0);
+
+      // Dynamically size the sidebar mask so items don't peek behind profile
+      function updateProfileMask() {
+        try {
+          const profile = document.querySelector(".profile-section");
+          const modules = document.querySelector(".modules-section");
+          if (!profile || !modules) return;
+          // Height of the profile card + extra buffer for shadows/rounded corners
+          const h = profile.offsetHeight + 32;
+          modules.style.setProperty("--profile-mask", h + "px");
+        } catch (_) {}
+      }
+
+      // Observe size/content changes to profile to recompute mask
+      const profEl = document.querySelector(".profile-section");
+      if (profEl && "ResizeObserver" in window) {
+        const ro = new ResizeObserver(updateProfileMask);
+        ro.observe(profEl);
+      }
+
+      // Recompute on events that could change layout
+      window.addEventListener("load", updateProfileMask);
+      window.addEventListener("resize", updateProfileMask);
+      document.addEventListener("DOMContentLoaded", updateProfileMask);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(updateProfileMask).catch(() => {});
+      }
+      // Apply once right away
+      updateProfileMask();
     </script>
   </body>
 </html>
