@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PROTO-BAI - DEV Mode Visualization</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #8b5fbf 0%, #60a5fa 100%);
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        height: 100vh;
+        padding: 20px;
+        gap: 20px;
+      }
+
+      .sidebar {
+        overflow: scroll;
+        scrollbar-width: none;
+        width: 280px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+
+      .profile-section {
+        background: rgba(139, 95, 191, 0.1);
+        border-radius: 15px;
+        padding: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .profile-pic {
+        font-size: 40px;
+        margin-bottom: 10px;
+      }
+
+      .user-info h3 {
+        color: #2d3748;
+        margin-bottom: 5px;
+      }
+
+      .status {
+        color: #10b981;
+        font-size: 12px;
+      }
+
+      .modules-section h4 {
+        color: #2d3748;
+        margin: 20px 0 15px 0;
+        font-size: 16px;
+      }
+
+      .module-btn {
+        width: 100%;
+        padding: 12px 20px;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 12px;
+        color: #2d3748;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: left;
+      }
+
+      .module-btn:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .command {
+        color: #4f46e5;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+
+      .command:hover {
+        color: #4338ca;
+      }
+      
+
+      .demo-queries {
+        margin-top: 10px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+      }
+
+      .demo-query {
+        display: inline-block;
+        margin: 3px;
+        padding: 5px 10px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        color: white;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .demo-query:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-1px);
+      }
+
+      .settings-section {
+        margin-top: 20px;
+      }
+
+      .setting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .setting-row label {
+        color: #2d3748;
+        font-size: 14px;
+      }
+
+      select {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.8);
+        color: #2d3748;
+      }
+
+      .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .chat-area {
+        flex: 1;
+        scrollbar-width: none;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 20px;
+        overflow-y: auto;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+
+      .welcome-message {
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .welcome-message h1 {
+        color: #8b5fbf;
+        font-size: 32px;
+        margin-bottom: 15px;
+      }
+
+      .welcome-message p {
+        color: #2d3748;
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      .dev-info {
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .message {
+        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      .message-header {
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .user-message .message-header {
+        color: #2563eb;
+      }
+
+      .ai-message .message-header {
+        color: #8b5fbf;
+      }
+
+      .system-message .message-header {
+        color: #ae4ae3;
+      }
+
+      .timestamp {
+        font-size: 12px;
+        color: #7c95bf;
+        font-weight: normal;
+      }
+
+      .command {
+        color: #4f46e5;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+
+      .command:hover {
+        color: #4338ca;
+      }
+
+      .demo-queries {
+        margin-top: 10px;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      .demo-query {
+        display: inline-block;
+        margin: 3px;
+        padding: 5px 10px;
+        background: rgba(99, 102, 241, 0.2);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: 15px;
+        color: #c7d2fe;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .demo-query:hover {
+        background: rgba(99, 102, 241, 0.3);
+        transform: translateY(-1px);
+      }
+
+      .input-area {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 15px;
+        display: flex;
+        scrollbar-width: none;
+        gap: 10px;
+        align-items: center;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+
+      .voice-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        background: #ec4899;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .voice-btn:hover {
+        background: #db2777;
+        transform: scale(1.05);
+      }
+
+      .text-input {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        background: transparent;
+        font-size: 14px;
+        color: #2d3748;
+        outline: none;
+      }
+
+      .text-input::placeholder {
+        color: #9ca3af;
+      }
+
+      .send-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        background: #8b5fbf;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .send-btn:hover {
+        background: #7c3aed;
+        transform: scale(1.05);
+      }
+
+      .typing-indicator {
+        display: none;
+        color: #8b5fbf;
+        font-style: italic;
+        animation: blink 1.5s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        50% {
+          opacity: 1;
+        }
+
+        51%,
+        100% {
+          opacity: 0.3;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Profile Section -->
+        <div class="profile-section">
+          <div class="profile-pic">🤖</div>
+          <div class="user-info">
+            <h3>User: Guest</h3>
+            <div class="status">Status: Online</div>
+          </div>
+        </div>
+
+        <!-- Modules Section -->
+        <div class="modules-section">
+          <h4>Modules</h4>
+          <button class="module-btn" onclick="activateModule('file-explorer')">
+            <span style="font-size: 18px">📁</span> File Explorer
+          </button>
+          <button class="module-btn" onclick="activateModule('web-crawler')">
+            <span style="font-size: 18px">🌐</span> Web Crawler
+          </button>
+          <button class="module-btn" onclick="activateModule('github-search')">
+            <span style="font-size: 18px">🐙</span> GitHub Search
+          </button>
+          <button class="module-btn" onclick="activateModule('ticket-booking')">
+            <span style="font-size: 18px">🎫</span> Ticket Booking
+          </button>
+          <button class="module-btn" onclick="activateModule('ai-sync')">
+            <span style="font-size: 18px">🤖</span> AI Sync
+          </button>
+          <button class="module-btn" onclick="activateModule('error-solver')">
+            <span style="font-size: 18px">🔧</span> Error Solver
+          </button>
+          <button class="module-btn" onclick="activateModule('python-docs')">
+            <span style="font-size: 18px">🐍</span> Python Documentation
+          </button>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="settings-section">
+          <h4>Settings</h4>
+          <div class="setting-row">
+            <label>Theme:</label>
+            <select onchange="changeTheme(this.value)">
+              <option value="fairy-tail">Fairy Tail</option>
+              <option value="ocean-breeze">Ocean Breeze</option>
+              <option value="sunset-glow">Sunset Glow</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label>Voice:</label>
+            <select onchange="changeVoice(this.value)">
+              <option value="girl-soft">Girl Soft</option>
+              <option value="male-professional">Male Professional</option>
+              <option value="neutral-calm">Neutral Calm</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Chat Area -->
+        <div class="chat-area" id="chatArea">
+          <div class="welcome-message">
+            <h1>🤖 Welcome to PROTO-BAI!</h1>
+            <p>Your intelligent assistant with self-learning capabilities.</p>
+            <div class="dev-info">
+              🎯 I learn from every interaction<br />
+              💬 Ask me anything using voice or text<br />
+              🔧 Currently running in <strong>DEVELOPMENT</strong> mode
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+          <button class="voice-btn" onclick="toggleVoice()" id="voiceBtn">
+            🎤
+          </button>
+          <input
+            type="text"
+            class="text-input"
+            placeholder="Ask me anything..."
+            id="textInput"
+            onkeypress="handleKeyPress(event)"
+          />
+          <button class="send-btn" onclick="sendMessage()">▶</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let isListening = false;
+      let messageCount = 0;
+
+      function getCurrentTime() {
+        return new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      function addMessage(sender, message, type = "user") {
+        const chatArea = document.getElementById("chatArea");
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${type}-message`;
+
+        messageDiv.innerHTML = `
+
+
+
+    <div class="message-header">
+        ${sender} <span class="timestamp">(${getCurrentTime()})</span>
+    </div>
+    <div>${message.replace(/\n/g, "<br>")}</div>
+`;
+
+        chatArea.appendChild(messageDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }
+
+      async function sendMessage() {
+        const input = document.getElementById("textInput");
+        const message = input.value.trim();
+
+        if (!message) return;
+
+        // Add user message
+        addMessage("You", message, "user");
+        input.value = "";
+
+        // Show typing indicator
+        showTypingIndicator();
+
+        try {
+          // Check if this is a Python docs command
+          const lowerMsg = message.toLowerCase();
+          if (
+            lowerMsg.startsWith("python ") ||
+            lowerMsg.startsWith("help ") ||
+            lowerMsg.startsWith("python_help ")
+          ) {
+            // Process Python documentation command
+            await processPythonCommand(message);
+          } else {
+            // Default response for other messages
+            setTimeout(() => {
+              hideTypingIndicator();
+              const responses = [
+                "🤖 (Mock Mode) I would help you with that! This is a development mode response.",
+                "📁 (Mock) I would analyze your files and provide insights. Enable production mode for full functionality.",
+                "🌐 (Mock) I would search the web and extract information for you. This requires production mode.",
+                "🔧 (Mock) I would debug and solve your coding problems. Full debugging available in production mode.",
+                "🎯 (Mock) I'm learning from our conversation! In production mode, I would provide more detailed responses.",
+              ];
+              const randomResponse =
+                responses[Math.floor(Math.random() * responses.length)];
+              addMessage("PROTO-BAI", randomResponse, "ai");
+            }, 1500);
+          }
+        } catch (error) {
+          console.error("Error processing message:", error);
+          hideTypingIndicator();
+          addMessage(
+            "PROTO-BAI",
+            "Sorry, something went wrong while processing your request.",
+            "ai"
+          );
+        }
+      }
+
+      
+
+      function showTypingIndicator() {
+        const chatArea = document.getElementById("chatArea");
+        const typingDiv = document.createElement("div");
+        typingDiv.className = "message ai-message typing-indicator";
+        typingDiv.id = "typingIndicator";
+        typingDiv.innerHTML = `
+                <div class="message-header">
+                    PROTO-BAI <span class="timestamp">(${getCurrentTime()})</span>
+                </div>
+                <div>🤔 Thinking...</div>
+            `;
+        chatArea.appendChild(typingDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }
+
+      function hideTypingIndicator() {
+        const typingIndicator = document.getElementById("typingIndicator");
+        if (typingIndicator) {
+          typingIndicator.remove();
+        }
+      }
+
+      function toggleVoice() {
+        const voiceBtn = document.getElementById("voiceBtn");
+
+        if (!isListening) {
+          isListening = true;
+          voiceBtn.textContent = "🔴";
+          voiceBtn.style.background = "#EF4444";
+          addMessage("System", "🎤 Listening... Speak now!", "system");
+
+          // Simulate voice recognition
+          setTimeout(() => {
+            isListening = false;
+            voiceBtn.textContent = "🎤";
+            voiceBtn.style.background = "#EC4899";
+
+            // Simulate recognized speech
+            const voiceInputs = [
+              "Hello PROTO-BAI",
+              "What can you do?",
+              "Help me with coding",
+              "Tell me about yourself",
+            ];
+            const randomInput =
+              voiceInputs[Math.floor(Math.random() * voiceInputs.length)];
+            addMessage("You (Voice)", randomInput, "user");
+
+            // Trigger AI response
+            showTypingIndicator();
+            setTimeout(() => {
+              hideTypingIndicator();
+              addMessage(
+                "PROTO-BAI",
+                "🎤 (Mock Voice) I heard you clearly! In production mode, I would provide full voice interaction.",
+                "ai"
+              );
+            }, 1500);
+          }, 3000);
+        }
+      }
+
+      // Python documentation search functionality
+      const pythonDocs = {
+        search: async function (query) {
+          try {
+            const response = await fetch(
+              "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyAWNPb5bgI0HgO9Sgsbc4BLuzqD0tzlQ54",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  contents: [
+                    {
+                      parts: [
+                        {
+                          text: `Search Python documentation for: ${query}`,
+                        },
+                      ],
+                    },
+                  ],
+                }),
+              }
+            );
+            const data = await response.json();
+            return data.candidates &&
+              data.candidates[0] &&
+              data.candidates[0].content
+              ? data.candidates[0].content.parts[0].text
+              : `Error: ${data.error || "Unknown error"}`;
+          } catch (error) {
+            console.error("Python docs error:", error);
+            return "Failed to connect to Python documentation service. Make sure the server is running.";
+          }
+        },
+
+        getHelp: async function (topic) {
+          try {
+            const response = await fetch(
+              "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyAWNPb5bgI0HgO9Sgsbc4BLuzqD0tzlQ54",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  contents: [
+                    {
+                      parts: [
+                        {
+                          text: `Get help with Python topic: ${topic}`,
+                        },
+                      ],
+                    },
+                  ],
+                }),
+              }
+            );
+            const data = await response.json();
+            return data.candidates &&
+              data.candidates[0] &&
+              data.candidates[0].content
+              ? data.candidates[0].content.parts[0].text
+              : `Error: ${data.error || "Unknown error"}`;
+          } catch (error) {
+            console.error("Python help error:", error);
+            return "Failed to get Python help. Make sure the server is running.";
+          }
+        },
+
+        demoQueries: [
+          "list comprehension",
+          "dictionary methods",
+          "decorators",
+          "context managers",
+          "generators",
+          "async/await",
+        ],
+
+        demoTopics: ["list", "dict", "os.path", "datetime", "json", "re"],
+      };
+
+      // Process Python documentation commands
+      async function processPythonCommand(command) {
+        const lowerCmd = command.toLowerCase();
+        let response = "";
+
+        if (lowerCmd.startsWith("python ")) {
+          const query = command.substring(7).trim();
+          response = await pythonDocs.search(query);
+        } else if (lowerCmd.startsWith("help ")) {
+          const topic = command.substring(5).trim();
+          response = await pythonDocs.getHelp(topic);
+        } else if (lowerCmd.startsWith("python_help ")) {
+          const topic = command.substring(11).trim();
+          response = await pythonDocs.getHelp(topic);
+        } else {
+          response =
+            'Invalid Python documentation command. Try "python <query>" or "help <topic>"';
+        }
+
+        addMessage("PROTO-BAI", response, "ai");
+      }
+
+      function activateModule(moduleName) {
+        if (moduleName === "python-docs") {
+          // Show Python documentation interface
+          const message =
+            `🐍 <strong>Python Documentation Search</strong><br><br>` +
+            `You can search Python documentation or get help on specific topics.<br><br>` +
+            `<strong>Try these commands:</strong><br>` +
+            `• <span class="command" onclick="handlePythonCommand('python list comprehension')">python list comprehension</span><br>` +
+            `• <span class="command" onclick="handlePythonCommand('help dict')">help dict</span><br>` +
+            `• <span class="command" onclick="handlePythonCommand('python_help os.path')">python_help os.path</span><br><br>` +
+            `Or type your own Python documentation query.`;
+
+          addMessage("System", message, "system");
+
+          // Show demo queries as quick buttons
+          let demoHtml = `<div class="demo-queries">`;
+          demoHtml += `<strong>Example searches:</strong><br>`;
+          pythonDocs.demoQueries.forEach((query) => {
+            demoHtml += `<button class="demo-query" onclick="handlePythonCommand('python ${query}')">${query}</button> `;
+          });
+          demoHtml += `<br><br><strong>Help topics:</strong><br>`;
+          pythonDocs.demoTopics.forEach((topic) => {
+            demoHtml += `<button class="demo-query" onclick="handlePythonCommand('help ${topic}')">${topic}</button> `;
+          });
+          demoHtml += `</div>`;
+
+          addMessage("System", demoHtml, "system");
+        } else {
+          // Default module activation
+          addMessage("System", `Activated module: ${moduleName}`, "system");
+        }
+      }
+
+      // Handle Python documentation commands from buttons
+      function handlePythonCommand(command) {
+        const input = document.getElementById("textInput");
+        input.value = command;
+        sendMessage();
+      }
+
+      function getModuleIcon(moduleName) {
+        const icons = {
+          "File Explorer": "📁",
+          "Web Crawler": "🌐",
+          "GitHub Search": "🐙",
+          "Ticket Booking": "🎫",
+          "AI Sync": "🤖",
+          "Error Solver": "🔧",
+        };
+        return icons[moduleName] || "⚙️";
+      }
+
+      function changeTheme(theme) {
+        const body = document.body;
+        const themes = {
+          "fairy-tail": "linear-gradient(135deg, #8B5FBF 0%, #60A5FA 100%)",
+          "ocean-breeze": "linear-gradient(135deg, #0EA5E9 0%, #06B6D4 100%)",
+          "sunset-glow": "linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)",
+        };
+        body.style.background = themes[theme];
+        addMessage(
+          "System",
+          `🎨 Theme changed to: ${theme
+            .replace("-", " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase())}`,
+          "system"
+        );
+      }
+
+      function changeVoice(voice) {
+        addMessage(
+          "System",
+          `🗣️ Voice changed to: ${voice
+            .replace("-", " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase())}`,
+          "system"
+        );
+      }
+
+      async function handleKeyPress(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault(); // Prevent new line in input
+          const input = document.getElementById("textInput");
+          if (!input) {
+            console.error("Input element #textInput not found");
+            return;
+          }
+          const message = input.value.trim();
+
+          if (message === "") return;
+
+          // Disable input while processing
+          input.disabled = true;
+          input.placeholder = "PROTO-BAI is thinking...";
+
+          try {
+            // Add user message to chat
+            addMessage("You", message, "user");
+            input.value = "";
+
+            // Call Gemini API
+            const response = await callGeminiAPI(message);
+
+            // Add AI response to chat
+            addMessage("PROTO-BAI", response, "ai");
+          } catch (error) {
+            console.error("Error:", error);
+            addMessage(
+              "System",
+              "Sorry, there was an error processing your request.",
+              "system"
+            );
+          } finally {
+            // Re-enable input
+            input.disabled = false;
+            input.placeholder = "Type your message...";
+            input.focus();
+
+            // Auto-scroll to bottom
+            const chatArea = document.querySelector(".chat-area");
+            chatArea.scrollTop = chatArea.scrollHeight;
+          }
+        } else if (event.key === "Enter" && event.shiftKey) {
+          // Allow new line with Shift+Enter
+          return;
+        }
+      }
+
+      // Gemini API Configuration
+      const GEMINI_API_KEY = "AIzaSyAWNPb5bgI0HgO9Sgsbc4BLuzqD0tzlQ54";
+      const GEMINI_API_URL =
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
+      // Function to call Gemini API
+      async function callGeminiAPI(prompt) {
+        showTypingIndicator();
+
+        try {
+          const response = await fetch(
+            `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    parts: [
+                      {
+                        text: prompt,
+                      },
+                    ],
+                  },
+                ],
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(
+              `API request failed with status ${response.status}`
+            );
+          }
+
+          const data = await response.json();
+          hideTypingIndicator();
+
+          if (
+            data.candidates &&
+            data.candidates[0] &&
+            data.candidates[0].content
+          ) {
+            return data.candidates[0].content.parts[0].text;
+          } else {
+            throw new Error("Invalid response format from API");
+          }
+        } catch (error) {
+          console.error("Error calling Gemini API:", error);
+          hideTypingIndicator();
+          return `Sorry, I encountered an error: ${error.message}`;
+        }
+      }
+
+      // Function to handle sending messages
+      async function sendMessage() {
+        const input = document.getElementById("textInput");
+        if (!input) {
+          console.error("Input element #textInput not found");
+          return;
+        }
+        const message = input.value.trim();
+
+        if (message === "") return;
+
+        // Disable input while processing
+        input.disabled = true;
+        input.placeholder = "PROTO-BAI is thinking...";
+
+        try {
+          // Add user message to chat
+          addMessage("You", message, "user");
+          input.value = "";
+
+          // Call Gemini API
+          const response = await callGeminiAPI(message);
+
+          // Add AI response to chat
+          addMessage("PROTO-BAI", response, "ai");
+        } catch (error) {
+          console.error("Error in sendMessage:", error);
+          addMessage(
+            "System",
+            "Sorry, there was an error processing your request.",
+            "system"
+          );
+        } finally {
+          // Re-enable input
+          input.disabled = false;
+          input.placeholder = "Type your message...";
+          input.focus();
+
+          // Auto-scroll to bottom
+          const chatArea = document.querySelector(".chat-area");
+          chatArea.scrollTop = chatArea.scrollHeight;
+        }
+      }
+
+      // Initialize with a demo message
+      setTimeout(() => {
+        addMessage(
+          "System",
+          "Welcome to PROTO-BAI DEV mode! Try typing a message or clicking the voice button.",
+          "system"
+        );
+      }, 1000);
+    </script>
+  </body>
+</html>
